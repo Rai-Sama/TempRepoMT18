@@ -1,0 +1,149 @@
+CREATE TABLE Students ( --
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    dob DATE NOT NULL,
+    gender CHAR(1),
+    enrollment_date DATE NOT NULL
+);
+
+CREATE TABLE Courses ( --
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(200) NOT NULL,
+    course_description TEXT,
+    credits INT NOT NULL,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Departments ( --
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(150) NOT NULL,
+    hod_id INT,
+    FOREIGN KEY (hod_id) REFERENCES Staff(staff_id)
+);
+
+CREATE TABLE Staff ( 
+    staff_id INT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    dob DATE NOT NULL,
+    hire_date DATE NOT NULL,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Classrooms ( --
+    classroom_id INT PRIMARY KEY,
+    room_number VARCHAR(50) NOT NULL,
+    capacity INT NOT NULL,
+    building_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Schedules ( 
+    schedule_id INT PRIMARY KEY,
+    course_id INT NOT NULL,
+    classroom_id INT NOT NULL,
+    staff_id INT NOT NULL,
+    day_of_week VARCHAR(10) NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id),
+    FOREIGN KEY (classroom_id) REFERENCES Classrooms(classroom_id),
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id)
+);
+
+CREATE TABLE Enrollments ( 
+    enrollment_id INT PRIMARY KEY,
+    student_id INT NOT NULL,
+    course_id INT NOT NULL,
+    enrollment_date DATE NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+CREATE TABLE Grades ( 
+    grade_id INT PRIMARY KEY,
+    student_id INT NOT NULL,
+    course_id INT NOT NULL,
+    grade CHAR(2),
+    graded_on DATE,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+CREATE TABLE Attendance (
+    attendance_id INT PRIMARY KEY,
+    student_id INT NOT NULL,
+    schedule_id INT NOT NULL,
+    attendance_date DATE NOT NULL,
+    status VARCHAR(10) NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (schedule_id) REFERENCES Schedules(schedule_id)
+);
+
+CREATE TABLE Libraries (
+    library_id INT PRIMARY KEY,
+    library_name VARCHAR(150) NOT NULL,
+    location VARCHAR(200) NOT NULL,
+    capacity INT NOT NULL
+);
+
+CREATE TABLE Books (
+    book_id INT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    author VARCHAR(150) NOT NULL,
+    isbn VARCHAR(20) UNIQUE NOT NULL,
+    library_id INT,
+    FOREIGN KEY (library_id) REFERENCES Libraries(library_id)
+);
+
+CREATE TABLE LibraryMemberships (
+    membership_id INT PRIMARY KEY,
+    student_id INT NOT NULL,
+    library_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (library_id) REFERENCES Libraries(library_id)
+);
+
+CREATE TABLE BorrowedBooks (
+    borrow_id INT PRIMARY KEY,
+    membership_id INT NOT NULL,
+    book_id INT NOT NULL,
+    borrowed_on DATE NOT NULL,
+    due_date DATE NOT NULL,
+    returned_on DATE,
+    FOREIGN KEY (membership_id) REFERENCES LibraryMemberships(membership_id),
+    FOREIGN KEY (book_id) REFERENCES Books(book_id)
+);
+
+CREATE TABLE Events (
+    event_id INT PRIMARY KEY,
+    event_name VARCHAR(200) NOT NULL,
+    event_date DATE NOT NULL,
+    location VARCHAR(200) NOT NULL,
+    organized_by INT,
+    FOREIGN KEY (organized_by) REFERENCES Staff(staff_id)
+);
+
+CREATE TABLE StudentClubs (
+    club_id INT PRIMARY KEY,
+    club_name VARCHAR(150) NOT NULL,
+    created_on DATE NOT NULL,
+    advisor_id INT,
+    FOREIGN KEY (advisor_id) REFERENCES Staff(staff_id)
+);
+
+CREATE TABLE ClubMemberships (
+    membership_id INT PRIMARY KEY,
+    student_id INT NOT NULL,
+    club_id INT NOT NULL,
+    joined_on DATE NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (club_id) REFERENCES StudentClubs(club_id)
+);
